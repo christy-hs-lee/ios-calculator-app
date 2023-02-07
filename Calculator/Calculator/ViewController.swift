@@ -15,7 +15,7 @@ class ViewController: UIViewController {
         static let space = " "
         static let decimal = "."
         static let minus = "-"
-        
+        static let comma = ","
     }
     
     @IBOutlet weak var scrollView: UIScrollView!
@@ -34,9 +34,9 @@ class ViewController: UIViewController {
     }
     
     var isFirst: Bool = true
-    
     var expressionArray: [String] = []
-
+    let numberFormatter = NumberFormatter()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         resetLabel()
@@ -47,7 +47,6 @@ class ViewController: UIViewController {
         operatorsLabel.text = Case.blank
     }
     
-    // 1. = 버튼 눌렀을 때, 2. 연산자를 눌렀는데, 숫자가 0이 아닐 때
     func makeStackView(_ operatorSign: String, _ operand: String) -> UIStackView {
         let view = UIStackView()
         let operatorLabel = UILabel()
@@ -75,6 +74,20 @@ class ViewController: UIViewController {
                                     animated: true)
     }
     
+    func formatNumber(_ result: Double) -> String {
+        numberFormatter.numberStyle = .decimal
+        numberFormatter.usesSignificantDigits = true
+        numberFormatter.maximumSignificantDigits = 20
+        
+        return numberFormatter.string(from: NSNumber(value: result)) ?? Case.blank
+    }
+    
+    func removeComma(_ inputString: String) -> String {
+        let removedCommaString = inputString.replacingOccurrences(of: Case.comma, with: Case.blank)
+        
+        return removedCommaString
+    }
+    
     @IBAction func allClearButtonTapped(_ sender: UIButton) {
         expressionArray.removeAll()
         print("clear, \(expressionArray)")
@@ -89,14 +102,11 @@ class ViewController: UIViewController {
     }
     
     @IBAction func numberButtonTapped(_ sender: UIButton) {
-        guard let number = sender.currentTitle else { return }
+        guard let number = sender.currentTitle,
+              currentOperand.count < 19 else { return }
         
         if isFirst {
-            if currentOperand == Case.zero {
-                operandsLabel.text = number
-            } else {
-                operandsLabel.text = number
-            }
+            operandsLabel.text = number
             isFirst = false
         }
         else {
@@ -104,7 +114,8 @@ class ViewController: UIViewController {
                 operandsLabel.text = number
             } else {
                 let inputNumber = currentOperand + number
-                operandsLabel.text = inputNumber
+                let removedComma = removeComma(inputNumber)
+                operandsLabel.text = formatNumber(Double(removedComma) ?? 0)
             }
         }
     }
@@ -150,6 +161,7 @@ class ViewController: UIViewController {
               !currentOperand.contains(Case.decimal) else { return }
         
         operandsLabel.text = currentOperand + decimalPoint
+        isFirst = false
     }
     
     @IBAction func signChangeButtonTapped(_ sender: UIButton) {
@@ -177,14 +189,14 @@ class ViewController: UIViewController {
         setScrollView()
         
         let stringExpression = expressionArray.joined(separator: "")
-        var parsedExpression = ExpressionParser.parse(from: stringExpression)
+        let removedCommaExpression = removeComma(stringExpression)
+        var parsedExpression = ExpressionParser.parse(from: removedCommaExpression)
         let result = parsedExpression.result()
 
-        operandsLabel.text = String(result)
+        operandsLabel.text = formatNumber(result)
         operatorsLabel.text = Case.blank
         
         expressionArray = []
         isFirst = true
-        print("12, \(expressionArray)")
     }
 }
