@@ -13,11 +13,17 @@ enum ExpressionParser {
         var operandQueue = CalculatorItemQueue<Double>()
         var operatorQueue = CalculatorItemQueue<Operator>()
         
+        // 연산자만 들어가도록 input을 돌면서 rawValue, compactmap
+        let operators = input.compactMap{ Operator(rawValue: $0) }
+        for `operator` in operators {
+            operatorQueue.enqueue(`operator`)
+        }
+    
+        print("operator: \(operators)")
+        
         for component in components {
             if let componentAsDouble = Double(component) {
                 operandQueue.enqueue(componentAsDouble)
-            } else if let componentAsOperator = Operator(rawValue: Character(component)) {
-                operatorQueue.enqueue(componentAsOperator)
             }
         }
         return Formula(operands: operandQueue, operators: operatorQueue)
