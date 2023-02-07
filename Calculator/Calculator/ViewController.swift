@@ -18,6 +18,8 @@ class ViewController: UIViewController {
         
     }
     
+    @IBOutlet weak var resultStackView: UIStackView!
+    
     @IBOutlet weak var operandsLabel: UILabel!
     @IBOutlet weak var operatorsLabel: UILabel!
     
@@ -44,10 +46,35 @@ class ViewController: UIViewController {
         operatorsLabel.text = Case.blank
     }
     
+    // 1. = 버튼 눌렀을 때, 2. 연산자를 눌렀는데, 숫자가 0이 아닐 때
+    func makeStackView(_ operatorSign: String, _ operand: String) -> UIStackView {
+        let view = UIStackView()
+        let operatorLabel = UILabel()
+        let operandLabel = UILabel()
+        
+        operatorLabel.text = operatorSign
+        operandLabel.text = operand
+        operatorLabel.textColor = .white
+        operandLabel.textColor = .white
+        
+        view.addArrangedSubview(operatorLabel)
+        view.addArrangedSubview(operandLabel)
+        
+        view.axis = .horizontal
+        view.alignment =  .fill
+        view.distribution = .fill
+        view.spacing = 8
+        
+        return view
+    }
+    
     @IBAction func allClearButtonTapped(_ sender: UIButton) {
         expressionArray.removeAll()
         print("clear, \(expressionArray)")
         resetLabel()
+        for arrangedSubview in resultStackView.arrangedSubviews {
+            arrangedSubview.removeFromSuperview()
+        }
     }
     
     @IBAction func clearEntryButtonTapped(_ sender: UIButton) {
@@ -61,11 +88,11 @@ class ViewController: UIViewController {
             if currentOperand == Case.zero {
                 operandsLabel.text = number
             } else {
-                let inputNumber = number
-                operandsLabel.text = inputNumber
-                isFirst = false
+                operandsLabel.text = number
             }
-        } else {
+            isFirst = false
+        }
+        else {
             if currentOperand == Case.zero {
                 operandsLabel.text = number
             } else {
@@ -78,21 +105,23 @@ class ViewController: UIViewController {
     @IBAction func operatorButtonTapped(_ sender: UIButton) {
         guard let operators = sender.currentTitle else { return }
         
+        var newStackView: UIStackView
+        
         // 숫자가 입력이 안되었을 때
         if currentOperand == Case.zero {
             operatorsLabel.text = operators
-            print("\(currentOperator), \(currentOperand)")
-            print("3:\(expressionArray)")
         } else {
             if currentOperator == Case.blank {
                 expressionArray.append(currentOperand)
+                // operand만
+                newStackView = makeStackView(Case.blank, currentOperand)
             } else {
                 // 숫자가 있고 연산자를 누를 때 -> 들어온 값을 append시켜야 한다
                 expressionArray.append(currentOperator)
                 expressionArray.append(currentOperand)
-                print("\(currentOperator), \(currentOperand)")
-                print("1:\(expressionArray)")
+                newStackView = makeStackView(currentOperator, currentOperand)
             }
+            resultStackView.addArrangedSubview(newStackView)
             operandsLabel.text = Case.zero
             operatorsLabel.text = operators
             print("out: \(currentOperator), \(currentOperand)")
