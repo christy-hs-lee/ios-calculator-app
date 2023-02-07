@@ -350,6 +350,7 @@
                         <outlet property="operandsLabel" destination="Lwz-OF-XHD" id="3kd-qb-dzd"/>
                         <outlet property="operatorsLabel" destination="HPC-iy-qdm" id="g05-g5-7C8"/>
                         <outlet property="resultStackView" destination="XRe-QE-UJf" id="jGr-gY-DMx"/>
+                        <outlet property="scrollView" destination="BOT-7g-vxv" id="y20-vM-n96"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

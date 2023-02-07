@@ -18,6 +18,7 @@ class ViewController: UIViewController {
         
     }
     
+    @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var resultStackView: UIStackView!
     
     @IBOutlet weak var operandsLabel: UILabel!
@@ -66,6 +67,12 @@ class ViewController: UIViewController {
         view.spacing = 8
         
         return view
+    }
+    
+    func setScrollView() {
+        scrollView.layoutIfNeeded()
+        scrollView.setContentOffset(CGPoint(x: 0, y: scrollView.contentSize.height - scrollView.bounds.height),
+                                    animated: true)
     }
     
     @IBAction func allClearButtonTapped(_ sender: UIButton) {
@@ -122,6 +129,7 @@ class ViewController: UIViewController {
                 newStackView = makeStackView(currentOperator, currentOperand)
             }
             resultStackView.addArrangedSubview(newStackView)
+            setScrollView()
             operandsLabel.text = Case.zero
             operatorsLabel.text = operators
             print("out: \(currentOperator), \(currentOperand)")
@@ -144,8 +152,6 @@ class ViewController: UIViewController {
         operandsLabel.text = currentOperand + decimalPoint
     }
     
-    
-    // -5 상태에서 9 누르면 -59 되도록 바꿔야 함
     @IBAction func signChangeButtonTapped(_ sender: UIButton) {
         guard currentOperand != Case.zero else { return }
         
@@ -166,14 +172,14 @@ class ViewController: UIViewController {
         expressionArray.append(currentOperator)
         expressionArray.append(currentOperand)
 
+        let newStackView = makeStackView(currentOperator, currentOperand)
+        resultStackView.addArrangedSubview(newStackView)
+        setScrollView()
+        
         let stringExpression = expressionArray.joined(separator: "")
-        print("stringExpression: \(stringExpression)")
         var parsedExpression = ExpressionParser.parse(from: stringExpression)
-        print("Parsed: \(parsedExpression)")
         let result = parsedExpression.result()
-        
-        print("result: \(result)")
-        
+
         operandsLabel.text = String(result)
         operatorsLabel.text = Case.blank
         
